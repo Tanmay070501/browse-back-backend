@@ -35,7 +35,7 @@ model Org {
 model Project {
   id     Int    @id @default(autoincrement())
   name   String
-  apiKey String
+  apiKey String @unique
 
   Org   Org? @relation(fields: [orgId], references: [id])
   orgId Int?

@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import { errorHandler } from "./utils/utils";
 import { authMiddleware } from "./middlewares/authMiddleware";
 import { userRoutes } from "./routes/user";
+import { projectRoutes } from "./routes/project";
 config()
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/auth', authRoutes)
 
 app.use("/user", authMiddleware, userRoutes)
+app.use("/project", authMiddleware, projectRoutes)
 
 app.get('/', (req, res) => {
     res.send('Express + TypeScript Server');

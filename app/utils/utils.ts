@@ -1,6 +1,6 @@
 import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { ErrorRequestHandler } from "express";
-import { RequestHandler } from "express";
+import crypto from "crypto"
 
 // excludes list of keys from object and return new object
 export function exclude(obj: Object,keys: String[]) {
@@ -39,4 +39,9 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
     console.log(err.message, err.code)
     const statusCode = typeof err?.code == 'string'? 500 : (err.code ?? 500)
     return res.status(statusCode).send({message: err.message})
+}
+
+
+export function generateAPIKey() {
+    return crypto.randomBytes(14).toString('hex'); // Generate a 256-bit (32 bytes) random key and convert it to hexadecimal
 }

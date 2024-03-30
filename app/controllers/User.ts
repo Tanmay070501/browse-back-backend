@@ -5,18 +5,14 @@ import { exclude, generateFailureResponse } from "../utils/utils";
 
 export const getUserDetails: RequestHandler = async (req: CustomRequest, res, next) => {
     try {
-        const user = await prisma.user.findUnique({
+        const user = await prisma.user.findUniqueOrThrow({
             where: {
                 user_id: req.userId
             },
             include: {
                 org: {
-                    where:{
-                        users: {
-                            some: {
-                               user_id: req.userId
-                            }
-                        }
+                    include: {
+                        users: true
                     }
                 }
             }

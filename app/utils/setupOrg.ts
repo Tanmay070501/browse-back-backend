@@ -15,6 +15,6 @@ export const generateToken = (user: User, tokenType: TokenType) => {
 
 export const sendVerificationEmail = async (user: User, tokenType: TokenType) => {
     const token = generateToken(user, tokenType)
-    const setupURL = `${process.env.BACKEND_URL}/auth/verify/${token}`
+    const setupURL = `${process.env.FRONTEND_URL}/setup_org?token=${token}`
     await sendMail(user.email, 'Verify your email and set up your org.', setupURL)
 }
