@@ -9,7 +9,7 @@ export function exclude(obj: Object,keys: String[]) {
     )
 }
 
-class CodedError extends Error {
+export class CodedError extends Error {
     code: number;
 
     constructor(message: string, code: number) {
@@ -36,7 +36,7 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         return res.status(500).send({message: "Something went wrong in DB while entering data!"})
     }
 
-    console.log(err)
-    const statusCode = typeof err?.code == 'string'? 500 : err.code
+    console.log(err.message, err.code)
+    const statusCode = typeof err?.code == 'string'? 500 : (err.code ?? 500)
     return res.status(statusCode).send({message: err.message})
 }

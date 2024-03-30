@@ -27,19 +27,19 @@ export const login: RequestHandler = async (req, res, next) => {
         if(!user.isAdmin && !user.orgId){
             console.log("No Orgs")
             res.send({
-                "type": "setup org",
+                "type": TokenType.SETUP_ORG,
                 token: generateToken(user, TokenType.SETUP_ORG)
             })
         }
         
         res.send({
-            ...exclude(user, ['password']),
+           type: TokenType.LOGIN,
+           token: generateToken(user, TokenType.LOGIN)
         })
 
     }catch(err){
         next(err)
     }
-    
 }
 
 export const signup: RequestHandler = async (req, res, next) => {
@@ -116,57 +116,58 @@ export const setupOrg: RequestHandler = async (req, res, next) => {
         if(missingKeys.length){
             generateFailureResponse(`Missing fields: ${missingKeys.join(', ')}`)
         }
-        try {
-            const payload = jwt.verify(token, JWT_SECRET_KEY)  
-            const { user_id, tokenType } = payload as JwtPayload
-            
-            if(!user_id) generateFailureResponse("User id missing from verification token")
-            
-            if(!tokenType) generateFailureResponse("Token Type missing")
-            
-            if(tokenType !== TokenType.SETUP_ORG){
-                generateFailureResponse("Invalid actions!")
-            }
 
-            const user = await prisma.user.findUnique({
-                where:{
-                    user_id: parseInt(user_id)
-                }
-            })
-
-            if(!user){
-                generateFailureResponse("User missing")
-            }
-
-            if(user && user.orgId){
-                generateFailureResponse("User already in an Org.")
-            }
-
-            if(!user.orgId){
-                const updateUser = await prisma.user.update({
-                    where:{
-                        user_id: user.user_id
-                    },
-                    data:{
-                        emailVerified: true,
-                        name,
-                    }
-                })
-                const org = await prisma.org.create({
-                    data: {
-                        name: orgName,
-                        users: {
-                            connect: {
-                                user_id: updateUser.user_id
-                            }
-                        }   
-                    },
-                })
-            }
-
-        }catch(err){
-            generateFailureResponse(err.message, 401)
+        const payload = jwt.verify(token, JWT_SECRET_KEY)  
+        const { user_id, tokenType } = payload as JwtPayload
+        
+        if(!user_id) generateFailureResponse("User id missing from verification token")
+        
+        if(!tokenType) generateFailureResponse("Token Type missing")
+        
+        if(tokenType !== TokenType.SETUP_ORG){
+            generateFailureResponse("Invalid actions!")
         }
+
+        const user = await prisma.user.findUnique({
+            where:{
+                user_id: parseInt(user_id)
+            }
+        })
+
+        if(!user){
+            generateFailureResponse("User missing")
+        }
+
+        if(user.orgId){
+            generateFailureResponse("User already in an Org.")
+        }
+        
+        const updateUser = await prisma.user.update({
+            where:{
+                user_id: user.user_id
+            },
+            data:{
+                emailVerified: true,
+                name,
+                isAdmin: true
+            }
+        })
+        const org = await prisma.org.create({
+            data: {
+                name: orgName,
+                users: {
+                    connect: {
+                        user_id: updateUser.user_id
+                    }
+                }   
+            },
+        })
+        
+        console.log(org)
+        res.send({
+            type: TokenType.LOGIN,
+            token: generateToken(user, TokenType.LOGIN)
+        })
     }catch(err){
         next(err)
     }

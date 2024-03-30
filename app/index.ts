@@ -4,6 +4,8 @@ import {config} from "dotenv"
 import { authRoutes } from "./routes/auth";
 import bodyParser from "body-parser";
 import { errorHandler } from "./utils/utils";
+import { authMiddleware } from "./middlewares/authMiddleware";
+import { userRoutes } from "./routes/user";
 config()
 
 const app = express();
@@ -17,6 +19,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/auth', authRoutes)
+
+app.use("/user", authMiddleware, userRoutes)
 
 app.get('/', (req, res) => {
     res.send('Express + TypeScript Server');
