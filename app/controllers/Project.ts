@@ -32,7 +32,7 @@ export const getProjects: RequestHandler = async (req: CustomRequest, res, next)
         if(!user.org) generateFailureResponse("User is not in any org...")
 
         const userOrg = user.org
-        console.log(userOrg)
+        // console.log(userOrg)
         
         res.send({
             projects: userOrg.projects

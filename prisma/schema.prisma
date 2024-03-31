@@ -37,6 +37,20 @@ model Project {
   name   String
   apiKey String @unique
 
-  Org   Org? @relation(fields: [orgId], references: [id])
-  orgId Int?
+  Org            Org?            @relation(fields: [orgId], references: [id])
+  orgId          Int?
+  SessionReplays SessionReplay[]
+}
+
+model SessionReplay {
+  id        Int      @id @default(autoincrement())
+  sessionId String   @unique
+  events    Json?
+  metadata  Json?
+  type String
+  started_at DateTime @default(now())
+  ended_at DateTime
+  
+  Project   Project? @relation(fields: [projectId], references: [id])
+  projectId Int?
 }

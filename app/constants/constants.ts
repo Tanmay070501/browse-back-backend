@@ -6,3 +6,10 @@ export enum TokenType {
     SETUP_ORG = "SETUP_ORG",
     LOGIN = "LOGIN"
 }
+
+export const API_KEY_HEADER = "browse-back-key"
+
+export enum ReplayTypes {
+    error = "error",
+    whole_session = "whole_session"
+}
