@@ -45,3 +45,14 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
 export function generateAPIKey() {
     return crypto.randomBytes(14).toString('hex'); // Generate a 256-bit (32 bytes) random key and convert it to hexadecimal
 }
+
+export const createDummyEndEvent = (startTime: number, time: number) => {
+    return {
+        type: 5,
+        data: {
+            tag: "end"
+        },
+        timestamp: time,
+        delay: time - startTime
+    }
+} 

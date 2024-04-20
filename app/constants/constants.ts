@@ -8,8 +8,11 @@ export enum TokenType {
 }
 
 export const API_KEY_HEADER = "browse-back-key"
+export const SESSION_KEY_HEADER = "session-id"
 
 export enum ReplayTypes {
     error = "error",
     whole_session = "whole_session"
 }
+
+export const NETWORK_PLUGIN_NAME = 'rrweb/network@1';

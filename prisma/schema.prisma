@@ -45,7 +45,7 @@ model Project {
 model SessionReplay {
   id        Int      @id @default(autoincrement())
   sessionId String   @unique
-  events    Json?
+  events    Json
   metadata  Json?
   type String
   started_at DateTime @default(now())
