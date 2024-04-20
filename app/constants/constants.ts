@@ -4,7 +4,8 @@ export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
 export enum TokenType {
     ORG_INVITE = "ORG_INVITE",
     SETUP_ORG = "SETUP_ORG",
-    LOGIN = "LOGIN"
+    LOGIN = "LOGIN",
+    RESET_PASSWORD = "RESET_PASSWORD"
 }
 
 export const API_KEY_HEADER = "browse-back-key"

@@ -2,7 +2,7 @@ import { RequestHandler } from "express"
 import { prisma } from "../utils/prismaClient"
 import { exclude, generateFailureResponse } from "../utils/utils"
 import * as bcrypt from "bcrypt"
-import { generateToken, sendVerificationEmail } from "../utils/setupOrg"
+import { generateToken, sendResetPasswordEmail, sendVerificationEmail } from "../utils/setupOrg"
 import { FRONTEND_URL, JWT_SECRET_KEY, TokenType } from "../constants/constants"
 import jwt, { JwtPayload } from "jsonwebtoken"
 
@@ -197,6 +197,65 @@ export const joinOrg: RequestHandler = async (req, res, next) => {
             token: generateToken(user, TokenType.LOGIN)
         })
         
+    }catch(err){
+        next(err)
+    }
+}
+
+export const resetPassword: RequestHandler = async (req, res, next) => {
+    try{
+        const { email } = req.body;
+
+        if(!email) generateFailureResponse("Email is required!");
+
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        })
+
+        if(!user) generateFailureResponse("User with this email does not exist")
+
+        await sendResetPasswordEmail(user.email, generateToken(user, TokenType.RESET_PASSWORD, {
+            expiresIn: '1d'
+        }))
+
+        res.send({message: "Mail sent successfully for reset password."})
+    }catch(err){
+        next(err)
+    }
+}
+
+export const updatePassword: RequestHandler = async (req, res, next) => {
+    try{
+        const { token, password } = req.body
+        
+        if(!token) generateFailureResponse("Token required.");
+        if(!password) generateFailureResponse("Password required")
+        
+        const payload = jwt.verify(token, JWT_SECRET_KEY)  
+        const { user_id, tokenType } = payload as JwtPayload
+        
+        if(!tokenType) generateFailureResponse("Token Missing");
+        if(tokenType !== TokenType.RESET_PASSWORD) generateFailureResponse("Invalid token type");
+        
+        if(!user_id) generateFailureResponse("User Id missing from token");
+        
+        const encryptedPassword = await bcrypt.hash(password, 13)
+
+        await prisma.user.update({
+            data: {
+                password: encryptedPassword,
+            },
+            where: {
+                user_id: user_id
+            }
+        })
+
+        res.send({
+            message: "Password Updated Successfully!"
+        })
+
     }catch(err){
         next(err)
     }

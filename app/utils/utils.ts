@@ -64,7 +64,9 @@ export const generateInvitationToken = (email: string,  orgId: number) => {
         email,
         orgId,
         tokenType: TokenType.ORG_INVITE, 
-    }, JWT_SECRET_KEY)
+    }, JWT_SECRET_KEY, {
+        expiresIn: '1d'
+    })
 
     return token
 }
