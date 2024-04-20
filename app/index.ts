@@ -55,7 +55,7 @@ app.use(errorHandler)
 
 
 io.on('connection',async (socket) => {
-    // console.log('A client connected', socket);
+    console.log('A client connected', socket.id);
     const socketSessId = socket.id;
     sessionBuffers[socketSessId] = {};
     const apiKey = socket.handshake.headers[API_KEY_HEADER]

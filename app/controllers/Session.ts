@@ -41,7 +41,6 @@ export const getSingleSession: RequestHandler = async (req: CustomRequest, res, 
                 }
             }
         })
-        console.log(session)
 
         if(!session) {
             generateFailureResponse("Invalid session id")

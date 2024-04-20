@@ -4,7 +4,7 @@ import { exclude } from "./utils"
 import { sendMail } from "./sendMail"
 import { JWT_SECRET_KEY, TokenType } from "../constants/constants"
 
-export const generateToken = (user: User, tokenType: TokenType) => {
+export const generateToken = (user: User , tokenType: TokenType) => {
     const token = jwt.sign({
         ...exclude(user, ['password']),
         tokenType, 
@@ -17,4 +17,9 @@ export const sendVerificationEmail = async (user: User, tokenType: TokenType) =>
     const token = generateToken(user, tokenType)
     const setupURL = `${process.env.FRONTEND_URL}/setup_org?token=${token}`
     await sendMail(user.email, 'Verify your email and set up your org.', setupURL)
+}
+
+export const sendInvitationEmail = async (email: string, orgName: string,  token: string) => {
+    const inviteURL = `${process.env.FRONTEND_URL}/join_org?token=${token}&org_name=${orgName}`
+    await sendMail(email, `Invitation from an Organization ${orgName}`, inviteURL)
 }

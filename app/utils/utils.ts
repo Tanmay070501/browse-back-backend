@@ -1,6 +1,8 @@
 import { PrismaClientInitializationError, PrismaClientKnownRequestError, PrismaClientRustPanicError, PrismaClientUnknownRequestError, PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { ErrorRequestHandler } from "express";
 import crypto from "crypto"
+import { JWT_SECRET_KEY, TokenType } from "../constants/constants";
+import * as jwt from "jsonwebtoken"
 
 // excludes list of keys from object and return new object
 export function exclude(obj: Object,keys: String[]) {
@@ -56,3 +58,13 @@ export const createDummyEndEvent = (startTime: number, time: number) => {
         delay: time - startTime
     }
 } 
+
+export const generateInvitationToken = (email: string,  orgId: number) => {
+    const token = jwt.sign({
+        email,
+        orgId,
+        tokenType: TokenType.ORG_INVITE, 
+    }, JWT_SECRET_KEY)
+
+    return token
+}

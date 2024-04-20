@@ -34,6 +34,7 @@ export const authMiddleware: RequestHandler = async (req: CustomRequest, _res, n
 
         if(!user) generateFailureResponse("User not found!")
         if(!user.orgId) generateFailureResponse("User not in an org!");
+        if(!user.emailVerified) generateFailureResponse("Email not verified");
         
         req.userId = user.user_id
         req.orgId = user.orgId

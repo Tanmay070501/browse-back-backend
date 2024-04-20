@@ -9,12 +9,10 @@ import { createDummyEndEvent } from "./utils"
 export const saveErrorSnapshot = async (data: string, apiKey: string, ) => {
     try{
         let {events, metadata} = JSON.parse(data)
-        // console.log("nots", metadata)
         if(!events?.length) return
         events = alignDomAndNetworkEvents(events)
         const startTime = events[0]?.timestamp
         const endTime = events[events.length - 1]?.timestamp
-        // console.log(events[0], events[events.length - 1])
         console.log("bro", startTime, endTime)
         if(!startTime || !endTime) return
         console.log("storing", apiKey)
@@ -33,7 +31,6 @@ export const saveErrorSnapshot = async (data: string, apiKey: string, ) => {
                 }
             }
         })
-        // console.log(session)
     }catch(err){
         console.log(err)
     }
@@ -74,7 +71,6 @@ export const saveSession = async (data: SingleBufferEvent, apiKey: string, ) => 
                 }
             }
         })
-        // console.log(session)
     }catch(err){
         console.log(err)
     }

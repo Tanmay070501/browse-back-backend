@@ -31,6 +31,10 @@ export const login: RequestHandler = async (req, res, next) => {
                 token: generateToken(user, TokenType.SETUP_ORG)
             })
         }
+
+        if(!user.emailVerified){
+            generateFailureResponse("Email not verified");
+        }
         
         res.send({
            type: TokenType.LOGIN,
@@ -84,27 +88,6 @@ export const signup: RequestHandler = async (req, res, next) => {
         next(err)
     }
 }
-
-// export const verify: RequestHandler = (req, res, next) => {
-//     try{
-//         const {token} = req.params
-//         try {
-//             const payload = jwt.verify(token, JWT_SECRET_KEY)  
-//             console.log(payload)
-//         }catch(err){
-//             if(err instanceof JsonWebTokenError){
-//                 generateFailureResponse(err.message)
-//             }
-//         }
-//         if(FRONTEND_URL){
-//             res.redirect(`${FRONTEND_URL}/login?message=success`)
-//         }else{
-//             generateFailureResponse('Something went wrong!')
-//         }
-//     }catch(err){
-//         next(err)
-//     }
-// }
 
 export const setupOrg: RequestHandler = async (req, res, next) => {
     try{
@@ -168,6 +151,52 @@ export const setupOrg: RequestHandler = async (req, res, next) => {
             type: TokenType.LOGIN,
             token: generateToken(user, TokenType.LOGIN)
         })
+    }catch(err){
+        next(err)
+    }
+}
+
+export const joinOrg: RequestHandler = async (req, res, next) => {
+    try{
+        const { token , name, password} = req.body;
+        if(!token) generateFailureResponse("Token missing")
+        if(!name) generateFailureResponse("Name missing");
+        if(!password) generateFailureResponse("Password either empty or missing");
+
+        const payload = jwt.verify(token, JWT_SECRET_KEY)  
+        const { orgId, email, tokenType } = payload as JwtPayload
+        
+        if(tokenType !== TokenType.ORG_INVITE) generateFailureResponse("Invalid Token Type", 403);
+
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        })
+
+        if(existingUser) generateFailureResponse("User already exist");
+
+        const encryptedPassword = await bcrypt.hash(password, 13)
+
+        const user = await prisma.user.create({
+            data: {
+                email: email,
+                emailVerified: true,
+                name: name,
+                password: encryptedPassword,
+                org: {
+                    connect: {
+                        id: orgId
+                    }
+                },
+            },
+        })
+
+        res.send({
+            type: TokenType.LOGIN,
+            token: generateToken(user, TokenType.LOGIN)
+        })
+        
     }catch(err){
         next(err)
     }
