@@ -9,6 +9,7 @@ export enum TokenType {
 }
 
 export const API_KEY_HEADER = "browse-back-key"
+export const RECORD_ERROR_KEY_HEADER = "browse-back-record-error"
 export const SESSION_KEY_HEADER = "session-id"
 
 export enum ReplayTypes {

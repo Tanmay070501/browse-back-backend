@@ -9,7 +9,7 @@ import { userRoutes } from "./routes/user";
 import { projectRoutes } from "./routes/project";
 import {Server} from"socket.io"
 import { v4 as uuidv4 } from 'uuid';
-import { API_KEY_HEADER, ReplayTypes, SESSION_KEY_HEADER } from "./constants/constants";
+import { API_KEY_HEADER, RECORD_ERROR_KEY_HEADER, ReplayTypes, SESSION_KEY_HEADER } from "./constants/constants";
 import { prisma } from "./utils/prismaClient";
 import { sessionRoutes } from "./routes/session";
 import { alignDomAndNetworkEvents } from "./utils/eventUtils";
@@ -72,6 +72,8 @@ io.on('connection',async (socket) => {
     const socketSessId = socket.id;
     sessionBuffers[socketSessId] = {};
     const apiKey = socket.handshake.headers[API_KEY_HEADER]
+    const recordError = socket.handshake.headers[RECORD_ERROR_KEY_HEADER]
+    console.log(recordError,"RECORD_ERROR_KEY_HEADER" );
     // const sessionKey = socket.handshake.headers[SESSION_KEY_HEADER]
     
     console.log("api", apiKey)
