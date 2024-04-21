@@ -104,7 +104,7 @@ io.on('connection',async (socket) => {
         delete sessionBuffers[socketSessId]       
     });
 
-    socket.once('create_session', async () => {
+    socket.on('create_session', async () => {
         console.log("creating session")
         const sessionId = uuidv4()
         sessionBuffers[socketSessId].sessionId = sessionId;
