@@ -92,6 +92,8 @@ io.on('connection',async (socket) => {
         socket.disconnect()
     }
 
+    socket.emit("start", "");
+
     // Handle disconnection
     socket.on('disconnect', async (s) => {
         console.log('A client disconnected: ', socketSessId, ' Saving its data');
