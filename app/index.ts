@@ -105,6 +105,7 @@ io.on('connection',async (socket) => {
     });
 
     socket.once('create_session', async () => {
+        console.log("creating session")
         const sessionId = uuidv4()
         sessionBuffers[socketSessId].sessionId = sessionId;
         sessionBuffers[socketSessId].events = [];
