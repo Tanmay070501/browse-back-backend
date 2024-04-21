@@ -5,6 +5,7 @@ import * as bcrypt from "bcrypt"
 import { generateToken, sendResetPasswordEmail, sendVerificationEmail } from "../utils/setupOrg"
 import { FRONTEND_URL, JWT_SECRET_KEY, TokenType } from "../constants/constants"
 import jwt, { JwtPayload } from "jsonwebtoken"
+import { logger } from "../utils/logger"
 
 export const login: RequestHandler = async (req, res, next) => {
     try{
@@ -25,7 +26,7 @@ export const login: RequestHandler = async (req, res, next) => {
         }
 
         if(!user.isAdmin && !user.orgId){
-            console.log("No Orgs")
+            logger.info("No Orgs")
             res.send({
                 "type": TokenType.SETUP_ORG,
                 token: generateToken(user, TokenType.SETUP_ORG)
@@ -146,7 +147,6 @@ export const setupOrg: RequestHandler = async (req, res, next) => {
             },
         })
         
-        console.log(org)
         res.send({
             type: TokenType.LOGIN,
             token: generateToken(user, TokenType.LOGIN)

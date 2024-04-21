@@ -42,8 +42,7 @@ export const alignDomAndNetworkEvents = (elements: EventWithTime[]): EventWithTi
     let [networkEv, domEv] = partitionArray(elements, e => {
         return e.type === 6 && e.data.plugin === NETWORK_PLUGIN_NAME
     })
-
-    console.log(domEv, networkEv)
+    
     let transformedData = transformData(
         networkEv,
         domEv[0].timestamp,

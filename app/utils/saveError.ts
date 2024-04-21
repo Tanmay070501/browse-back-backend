@@ -5,6 +5,7 @@ import { prisma } from "./prismaClient"
 import { EventWithTime } from "../@types/event"
 import { SessionBuffer, SingleBufferEvent } from "../@types/type"
 import { createDummyEndEvent } from "./utils"
+import { logger } from "./logger"
 
 export const saveErrorSnapshot = async (data: string, apiKey: string, ) => {
     try{
@@ -13,9 +14,9 @@ export const saveErrorSnapshot = async (data: string, apiKey: string, ) => {
         events = alignDomAndNetworkEvents(events)
         const startTime = events[0]?.timestamp
         const endTime = events[events.length - 1]?.timestamp
-        console.log("bro", startTime, endTime)
+        logger.info(`startTime: ${startTime}, endTime: ${endTime}`)
         if(!startTime || !endTime) return
-        console.log("storing", apiKey)
+        logger.info(`storing data for apiKey: ${apiKey}`);
         await prisma.sessionReplay.create({
             data: {
                 sessionId: uuidv4() as string,
@@ -32,7 +33,7 @@ export const saveErrorSnapshot = async (data: string, apiKey: string, ) => {
             }
         })
     }catch(err){
-        console.log(err)
+        logger.error(err)
     }
 }
 
@@ -41,14 +42,14 @@ export const saveSession = async (data: SingleBufferEvent, apiKey: string, ) => 
         let {events, metadata, sessionId} = data;
 
         if(!sessionId){
-            console.log("Can't save, session Id missing");
+            logger.info("Can't save, session Id missing");
             return;
         }
         if(!events?.length) return
         
         events = alignDomAndNetworkEvents(events)
         const startTime = events[0]?.timestamp
-        console.log("bro", startTime)
+        logger.info(`startTime: ${startTime}`);
         
         if(!startTime) return
         
@@ -72,7 +73,7 @@ export const saveSession = async (data: SingleBufferEvent, apiKey: string, ) => 
             }
         })
     }catch(err){
-        console.log(err)
+        logger.error(err);
     }
 }
 
@@ -83,7 +84,7 @@ export const retrieveSessionEvent = (data: string) => {
         if(!sessionId) return null;
         return {events, sessionId: sessionId, metadata: metadata}
     }catch(err){
-        console.log(err.message)
+        logger.error(err);
         return null
     }
 }

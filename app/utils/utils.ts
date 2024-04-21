@@ -3,6 +3,7 @@ import { ErrorRequestHandler } from "express";
 import crypto from "crypto"
 import { JWT_SECRET_KEY, TokenType } from "../constants/constants";
 import * as jwt from "jsonwebtoken"
+import { logger } from "./logger";
 
 // excludes list of keys from object and return new object
 export function exclude(obj: Object,keys: String[]) {
@@ -27,6 +28,7 @@ export const generateFailureResponse = (message: string, code:number = 500) => {
 }
 
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+    logger.error(err)
     if(
         err instanceof PrismaClientValidationError ||
         err instanceof PrismaClientKnownRequestError || 
@@ -34,11 +36,10 @@ export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
         err instanceof PrismaClientRustPanicError || 
         err instanceof PrismaClientUnknownRequestError
     ){
-        console.log(err)
         return res.status(500).send({message: "Something went wrong in DB while entering data!"})
     }
 
-    console.log(err.message, err.code)
+    logger.warn(`${err.message}, ${err.code}`)
     const statusCode = typeof err?.code == 'string'? 500 : (err.code ?? 500)
     return res.status(statusCode).send({message: err.message})
 }
