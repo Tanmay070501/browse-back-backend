@@ -40,6 +40,8 @@ export const getUserDetails: RequestHandler = async (req: CustomRequest, res, ne
 export const inviteUser: RequestHandler = async (req: CustomRequest, res, next) => {
     try{
 
+        if(!req.isAdmin) generateFailureResponse("Only admin is allowed to invite.")
+        
         const { email } = req.body;
 
         if(!email) generateFailureResponse("Email empty or missing in payload");
