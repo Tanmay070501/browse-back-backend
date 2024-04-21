@@ -17,20 +17,33 @@ import { retrieveSessionEvent, saveErrorSnapshot, saveSession } from "./utils/sa
 import { Prisma } from "@prisma/client";
 import { SessionBuffer, SingleBufferEvent } from "./@types/type";
 import { EventWithTime } from "./@types/event";
+import { createServer } from "http";
 
 config()
 
 const app = express();
 const port = process.env.PORT || 8000;
 
-// const server = http.createServer(app);
-const io = new Server(5000, {
+// socket on same port
+const server = createServer(app)
+
+const io = new Server(server, {
     cors: {
         origin: "*",
     },
-    pingInterval: 60000,
-    pingTimeout: 60000,
-},);
+    maxHttpBufferSize: 10e8,
+})
+
+
+// const server = http.createServer(app);
+// const io = new Server(5000, {
+//     cors: {
+//         origin: "*",
+//     },
+//     pingInterval: 60000,
+//     pingTimeout: 60000,
+// },);
+
 
 const sessionBuffers: SessionBuffer = {};
 
@@ -121,6 +134,8 @@ io.on('connection',async (socket) => {
 
 });
 
-app.listen(port, async () => {
+// server.listen
+
+server.listen(port, async () => {
     console.log(`[server]: Server is running at port ${port}`);
 });
