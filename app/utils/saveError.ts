@@ -72,6 +72,7 @@ export const saveSession = async (data: SingleBufferEvent, apiKey: string, ) => 
                 }
             }
         })
+        logger.info(`Successfully saved ${sessionId}`);
     }catch(err){
         logger.error(err);
     }
