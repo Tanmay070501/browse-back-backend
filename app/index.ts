@@ -9,14 +9,11 @@ import { userRoutes } from "./routes/user";
 import { projectRoutes } from "./routes/project";
 import {Server} from"socket.io"
 import { v4 as uuidv4 } from 'uuid';
-import { API_KEY_HEADER, RECORD_ERROR_KEY_HEADER, ReplayTypes, SESSION_KEY_HEADER } from "./constants/constants";
+import { API_KEY_HEADER, RECORD_ERROR_KEY_HEADER } from "./constants/constants";
 import { prisma } from "./utils/prismaClient";
 import { sessionRoutes } from "./routes/session";
-import { alignDomAndNetworkEvents } from "./utils/eventUtils";
 import { retrieveSessionEvent, saveErrorSnapshot, saveSession } from "./utils/saveError";
-import { Prisma } from "@prisma/client";
-import { SessionBuffer, SingleBufferEvent } from "./@types/type";
-import { EventWithTime } from "./@types/event";
+import { SessionBuffer } from "./@types/type";
 import { createServer } from "http";
 
 config()
@@ -61,7 +58,7 @@ app.use("/project", authMiddleware, projectRoutes)
 app.use("/session", authMiddleware, sessionRoutes)
 
 app.get('/', (req, res) => {
-    res.send('Express + TypeScript Server');
+    res.send('Hi');
 });
 
 app.use(errorHandler)
@@ -73,8 +70,6 @@ io.on('connection',async (socket) => {
     sessionBuffers[socketSessId] = {};
     const apiKey = socket.handshake.headers[API_KEY_HEADER]
     const recordError = socket.handshake.headers[RECORD_ERROR_KEY_HEADER]
-    console.log(typeof recordError,"RECORD_ERROR_KEY_HEADER" );
-    // const sessionKey = socket.handshake.headers[SESSION_KEY_HEADER]
     
     console.log("api", apiKey)
     if(!apiKey) {
@@ -98,6 +93,10 @@ io.on('connection',async (socket) => {
 
     // Handle disconnection
     socket.on('disconnect', async (s) => {
+        if(recordError === 'true'){
+            console.log('A client disconnected: ', socketSessId);
+            return;
+        }
         console.log('A client disconnected: ', socketSessId, ' Saving its data');
 
         if(!sessionBuffers?.[socketSessId]?.events?.length){
