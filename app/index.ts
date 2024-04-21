@@ -29,7 +29,7 @@ const io = new Server(server, {
     cors: {
         origin: "*",
     },
-    maxHttpBufferSize: 10e8,
+    maxHttpBufferSize: 5e8, // 500MB
 })
 
 
