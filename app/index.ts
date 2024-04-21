@@ -73,7 +73,7 @@ io.on('connection',async (socket) => {
     sessionBuffers[socketSessId] = {};
     const apiKey = socket.handshake.headers[API_KEY_HEADER]
     const recordError = socket.handshake.headers[RECORD_ERROR_KEY_HEADER]
-    console.log(recordError,"RECORD_ERROR_KEY_HEADER" );
+    console.log(typeof recordError,"RECORD_ERROR_KEY_HEADER" );
     // const sessionKey = socket.handshake.headers[SESSION_KEY_HEADER]
     
     console.log("api", apiKey)
