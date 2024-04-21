@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { CustomRequest } from "../@types/type";
 import { prisma } from "../utils/prismaClient";
-import { generateFailureResponse } from "../utils/utils";
+import { exclude, generateFailureResponse } from "../utils/utils";
 import { logger } from "../utils/logger";
 
 export const getSessions: RequestHandler = async (req: CustomRequest, res, next) => {
@@ -99,7 +99,7 @@ export const getSessionsPaginated: RequestHandler = async (req: CustomRequest, r
         })
 
         res.send({
-            sessions: sessions ?? [],
+            sessions: (sessions ?? []).map(session => exclude(session, ["events"])),
             totalPage: Math.ceil(totalCount / count),
             totalRows: totalCount
         })
